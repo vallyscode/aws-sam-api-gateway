@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  service
+  
+  Simple REST-like service template.
+
+Parameters:
+  Env:
+    Description: Logical environment like dev, test, prod etc
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - test
+      - prod
+
+Globals:
+  Function:
+    Timeout: 5
+
+Resources:
+  EchoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: echo-service/
+      Handler: handler
+      Runtime: go1.x
+      Tracing: Active
+      Events:
+        EchoService:
+          Type: Api
+          Properties:
+            Path: /echo
+            Method: POST
+
+Outputs:
+  EchoAPI:
+    Description: "API Gateway endpoint URL for echo service"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/echo/"
+  EchoFunction:
+    Description: "Echo function ARN"
+    Value: !GetAtt EchoFunction.Arn
+  EchoFunctionIamRole:
+    Description: "Implicit IAM Role created for echo function"
+    Value: !GetAtt EchoFunctionRole.Arn
